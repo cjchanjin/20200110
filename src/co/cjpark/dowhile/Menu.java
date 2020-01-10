@@ -1,6 +1,13 @@
 package co.cjpark.dowhile;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+
+import co.cjpark.countries.CountryDto;
+import co.cjpark.countries.CountryService;
+import co.cjpark.countries.CountryServiceImpl;
 
 public class Menu {
 	Scanner sc = new Scanner(System.in);
@@ -49,13 +56,54 @@ public class Menu {
 			System.out.println("=======================");
 			System.out.println("원하는 메뉴 번호를 입력하세요.  ");
 			choice = sc.nextInt();
-
+			sc.nextLine();
+			
+			CountryServiceImpl ctr = new CountryServiceImpl();
+			CountryDto dto = new CountryDto();
 			switch (choice) {
 			case 1:
-				System.out.println("직원 조회하는 화면");
+				//국가 조회하는 연결
+				CountryService service = new CountryServiceImpl();
+				List<CountryDto> list = new ArrayList<CountryDto>();
+				try {
+					list = service.allSelect();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				for(CountryDto dto1 : list) {
+					System.out.print(dto1.getCountry_id() + " : ");
+					System.out.print(dto1.getCountry_name() + " : ");
+					System.out.println(dto1.getRegion_id() + " : ");
+				}
+				
+				Scanner sc = new Scanner(System.in);
+				System.out.println("검색할 지역 ID(숫자)를 입력하세요");
+				int key = sc.nextInt();
+				try {
+					dto = ctr.select(key);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				sc.close();
+				System.out.println(dto.getCountry_id() + " " +dto.getCountry_name() + " " + dto.getRegion_id());
 				break;
+				
 			case 2:
-				System.out.println("직원 등록하는 화면");
+				ctr = new CountryServiceImpl();
+				dto = new CountryDto();
+				dto.setCountry_id("KR");
+				dto.setCountry_name("KOREA");
+				dto.setRegion_id(3);
+				try {
+					int n = ctr.insert(dto);
+					if(n != 0)
+						System.out.println("정상입력되었음");
+					else
+						System.out.println("입력이 실패하였음");
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				
 				break;
 			case 3:
 				System.out.println("직원 갱신하는 화면");
